@@ -1,3 +1,3 @@
-file(GLOB SOURCES *.c *.cpp)
+file(GLOB SOURCES CONFIGURE_DEPENDS *.c *.cpp)
 add_executable(main ${SOURCES})
 target_link_libraries(main PRIVATE foo)

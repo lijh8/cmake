@@ -97,3 +97,60 @@ $ cmake --build build -j4 # --target clean # -v # verbose
 
 
 ---
+
+
+https://cmake.org/cmake/help/latest/command/file.html#filesystem
+
+We do not recommend using GLOB to collect a list of source files from your
+source tree. If no CMakeLists.txt file changes when a source is added or removed
+then the generated build system cannot know when to ask CMake to regenerate.
+
+CMake 会生成依赖 CMakeLists.txt 的规则，如果 CMakeLists.txt 时间戳变化，会触发重新配置。
+
+1. 不使用GLOB, 明确列出文件名时，如果源代码文件发生了新增/删除，
+也需要在 CMakeLists.txt 中修改对应文件名，导致 CMakeLists.txt 时间戳发生变化，
+如果此时运行 cmake --build，自动触发重新配置，而不需要手动 cmake -B;
+
+add_executable(myapp
+    main.cpp
+    foo.cpp
+)
+
+2. 使用GLOB的情况，如果源代码文件发生新增/删除，
+可能忽略从 CMakeLists.txt 中增删相应文件名，CMakeLists.txt 时间戳不变，
+如果此时运行 cmake --build，不会触发重新配置，需要手动 cmake -B;
+
+file(GLOB SOURCES *.c *.cpp)
+add_executable(main ${SOURCES})
+
+3. 如果必须使用GLOB，添加CONFIGURE_DEPENDS（CMake 3.12+）
+这样不需要再使用 touch 命令修改 CMakeLists.txt 时间戳，或手动运行 CMake -B;
+
+file(GLOB SOURCES CONFIGURE_DEPENDS *.c *.cpp)
+add_executable(myapp ${SOURCES})
+
+
+$ cmake --build build # -v # --target=clean
+[ 25%] Building CXX object foo/CMakeFiles/foo.dir/foo.cpp.o
+cc1plus: fatal error: /home/ljh/doc/cmake/src/foo/foo.cpp: No such file or directory
+compilation terminated.
+gmake[2]: *** [foo/CMakeFiles/foo.dir/build.make:79: foo/CMakeFiles/foo.dir/foo.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:129: foo/CMakeFiles/foo.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2
+$
+$ touch src/CMakeLists.txt
+$
+$ cmake --build build # -v # --target=clean
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/ljh/doc/cmake/build
+[ 25%] Building C object foo/CMakeFiles/foo.dir/foo.c.o
+[ 50%] Linking C shared library libfoo.so
+[ 50%] Built target foo
+[ 75%] Building C object main/CMakeFiles/main.dir/main.c.o
+[100%] Linking C executable main
+[100%] Built target main
+$
+
+
+---
