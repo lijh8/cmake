@@ -1,0 +1,92 @@
+https://cmake.org/cmake/help/book/mastering-cmake/
+https://cmake.org/cmake/help/latest/
+
+https://cmake.org/features/
+Target-centric approach
+
+Modern CMake allows the build to be specified as a set of targets (executables,
+libraries, custom commands). Each target defines what other targets it depends
+on directly. CMake then performs the build in the correct order and includes
+transitive link targets.
+
+$ apt install cmake
+$ cmake -B build -S . # -DENABLE_SANITIZERS=ON
+$ cmake -B build -S . # -DCMAKE_BUILD_TYPE=Debug # Release
+$ cmake --build build -j4 # --target clean # -v # verbose
+$ make -C build DESTDIR=~/myapp install # staged install
+
+## or,
+$ mkdir build && cd build
+$ cmake .. # -DCMAKE_BUILD_TYPE=Debug # Release
+$ make -j4 # -s # silent
+$ make DESTDIR=~/myapp install
+
+
+---
+
+
+Note:
+
+# link with a cmake target.
+link_libraries(foo)
+
+# link with a library using -lfoo, e.g., libfoo.so, or, libfoo.a,
+link_libraries(-lfoo)
+link_directories(../foo)
+include_directories(../foo)
+
+
+---
+
+
+PUBLIC: 当前目标用，也传播给链接到当前目标的使用者
+PRIVATE: 当前目标自己用，不传播给链接到当前目标的使用者
+INTERFACE: 当前目标自己不用，传播给链接到当前目标的使用者
+
+foo/CMakeLists.txt
+target_link_libraries(foo PUBLIC bar)                # A - 建立依赖关系
+target_include_directories(foo PUBLIC /foo/include)  # B - 设置包含目录
+target_compile_definitions(foo PUBLIC -DFOO_ENABLED) # C - 设置编译定义
+
+main/CMakeLists.txt
+target_link_libraries(main PUBLIC foo)               # 这行触发传播
+                                                     # main -> foo -> bar
+                                                     # bar通过foo, 被main访问;
+                                                     # main是foo的使用者.
+
+
+---
+
+
+CMake target-level link:
+
+target_link_libraries(main PUBLIC foo)
+
+. 这是 Modern CMake 的目标级别链接;
+
+. 使用被链接目标中的完整库文件路径 ../foo/libfoo.so.1.2.3 ,
+  而非使用 ` -L/path/to `, ` -lfoo ` ,
+  这适用于静态库 ` .a `, 或动态共享库 ` .so ` ;
+
+. Propagate transitive usage requirements,
+  https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements ,
+  传递被链接目标中 target_include_directories 命令,
+  其中的 PUBLIC, INTERFACE 公开的头文件包含路径,
+  自动获得头文件包含路径 include ` -I/header/include/path/ ` ;
+
+. 管理依赖，先构建被链接目标;
+
+
+---
+
+
+执行配置:
+当修改/增/删 CMakeLists.txt, 增/删 C, C++ 文件或目录结构时;
+$ cmake -B build -S . # -DCMAKE_BUILD_TYPE=Debug # Release
+
+执行构建:
+当只修改了现有 C, C++ 文件中代码时;
+$ cmake --build build -j4 # --target clean # -v # verbose
+
+
+---
