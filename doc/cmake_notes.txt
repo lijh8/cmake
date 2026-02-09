@@ -10,16 +10,23 @@ on directly. CMake then performs the build in the correct order and includes
 transitive link targets.
 
 $ apt install cmake
-$ cmake -B build -S . # -DENABLE_SANITIZERS=ON
-$ cmake -B build -S . # -DCMAKE_BUILD_TYPE=Debug # Release
-$ cmake --build build -j4 # --target clean # -v # verbose
-$ make -C build DESTDIR=~/myapp install # staged install
 
-## or,
+# modern
+$ cmake -B build -S src # -DCMAKE_BUILD_TYPE=Debug # Release
+$ cmake --build build -j4 # --target clean # -v # verbose
+
+# traditional
 $ mkdir build && cd build
 $ cmake .. # -DCMAKE_BUILD_TYPE=Debug # Release
 $ make -j4 # -s # silent
+
+# staged install
+$ cd build
 $ make DESTDIR=~/myapp install
+
+# choose compiler using environment variables or command line arguments
+$ CC=clang CXX=clang++ cmake -B build -S src
+$ cmake -B build -S src -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
 
 
 ---

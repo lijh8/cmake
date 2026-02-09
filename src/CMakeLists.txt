@@ -1,7 +1,9 @@
+# CC=gcc CXX=g++ cmake -B build -S src
+# cmake -B build -S src -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
 cmake_minimum_required(VERSION 3.31)
 project(myapp VERSION 1.2.3)
-set(CMAKE_C_COMPILER gcc) # .cpp
-set(CMAKE_C_STANDARD 11) # .cpp
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE) # boolean set(): TRUE/FALSE
 set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 
