@@ -65,6 +65,18 @@ target_link_libraries(main PUBLIC foo)               # 这行触发传播
 ---
 
 
+gnu makefile            , cmake                                                ;
+CPPFLAGS += -I../foo    , target_include_directories(mytarget PUBLIC ../foo)   ;
+LDLIBS += -lfoo         , target_link_libraries     (mytarget PUBLIC -lfoo)    ;
+LDFLAGS += -L../foo     , target_link_directories   (mytarget PUBLIC ../foo)   ;
+CPPFLAGS += -DFOO       , target_compile_definitions(mytarget PUBLIC FOO=1)    ;
+CFLAGS/CXXFLAGS += -g   , target_compile_options    (mytarget PUBLIC -g)       ;
+LDFLAGS += -Wl,etc.     , target_link_options       (mytarget PUBLIC -Wl,etc.) ;
+
+
+---
+
+
 CMake target-level link:
 
 target_link_libraries(main PUBLIC foo)
