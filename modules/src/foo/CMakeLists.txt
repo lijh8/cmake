@@ -1,0 +1,20 @@
+# mix legacy code with c++20 modules
+set(TARGET foo)
+add_library(${TARGET} SHARED)
+file(GLOB LEGACY_SOURCES CONFIGURE_DEPENDS *.c *.cpp)
+file(GLOB MODULE_SOURCES CONFIGURE_DEPENDS *.cppm)
+target_sources(${TARGET}
+    PRIVATE ${LEGACY_SOURCES}
+    PUBLIC
+        FILE_SET CXX_MODULES
+        TYPE CXX_MODULES
+        BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
+        FILES ${MODULE_SOURCES}
+)
+
+target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+set_target_properties(foo PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 14)
+    target_compile_options(${TARGET} PUBLIC -fmodules-ts)
+endif()
