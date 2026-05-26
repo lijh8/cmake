@@ -2,7 +2,7 @@
 # cmake -B build -S src -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
 # cmake --build build
 cmake_minimum_required(VERSION 3.28)
-project(myapp LANGUAGES CXX)
+project(myapp VERSION 1.2.3)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
