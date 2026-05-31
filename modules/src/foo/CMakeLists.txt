@@ -1,10 +1,9 @@
-# mix legacy code with c++20 modules
 set(TARGET foo)
 add_library(${TARGET} SHARED)
-file(GLOB LEGACY_SOURCES CONFIGURE_DEPENDS *.c *.cpp)
+file(GLOB IMPL_SOURCES CONFIGURE_DEPENDS *.c *.cpp)
 file(GLOB MODULE_SOURCES CONFIGURE_DEPENDS *.cppm)
 target_sources(${TARGET}
-    PRIVATE ${LEGACY_SOURCES}
+    PRIVATE ${IMPL_SOURCES}
     PUBLIC
         FILE_SET CXX_MODULES
         TYPE CXX_MODULES
